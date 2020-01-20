@@ -126,21 +126,20 @@ SQLite3::Database.new(ARGV[0] || 'isj.sqlite3') do |db|
 
         # 丁目名なしの大字がただ 1 つだけ存在すればそれを採用
         unless result
-          results.reject! {|(_, _, _, ooaza)| ooaza.match(/(:?\d+|[一二三四五六七八九十百]+)丁目$/) }
+          results.reject! do |(_, _, _, ooaza, koaza)|
+            ooaza.match(/(:?\d+|[一二三四五六七八九十百]+)丁目$/) && koaza.empty?
+          end
           if results.length == 1
             result =  results[0]
-          else
-            # 今回はこれで一意に決定できると仮定
-            raise("Could not determine a koaza in: #{results}") unless result
           end
         end
-      else # results.length == 0
+      end
+
+      unless result
         # お手上げ
         out.add_row([addr, nil, nil, nil, nil])
         next
       end
-
-      raise 'expected a result' unless result
 
       (koaza_id, pref, city, ooaza, koaza, ooaza_lat, ooaza_lon) = result
 
