@@ -128,10 +128,6 @@ ruby <<RUBY
         VALUES (?, ?, ?, ?, ?);
     SQL
 
-    # CSV の converters 用
-    ITSELF = Proc.new {|x| x }
-    TO_I = Proc.new {|x| x.to_i }
-
     print 'Exporting 大字・町丁目レベル位置参照情報... '
 
     begin
