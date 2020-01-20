@@ -67,11 +67,13 @@ SQLite3::Database.new(ARGV[0] || 'isj.sqlite3') do |db|
         JOIN cities ON cities.id = city
         JOIN prefectures ON prefectures.id = prefecture
       WHERE
-        prefectures.name||cities.name||ooazas.name||koazas.name LIKE ?1
-        OR replace(?1, '%', '')
-          LIKE prefectures.name
-            || cities.name
-            || replace(replace(ooazas.name, '大字', '')||koazas.name, '字', '')||'%'
+        ooazas.city IN (SELECT id FROM cities WHERE replace(?1, '%', '') LIKE '%'||name||'%')
+        AND (
+          prefectures.name||cities.name||ooazas.name||koazas.name LIKE ?1
+          OR replace(?1, '%', '')
+            LIKE prefectures.name||cities.name
+              || replace(replace(ooazas.name, '大字', '')||koazas.name, '字', '')||'%'
+        )
   SQL
   search_gaiku = db.prepare(<<-SQL)
     SELECT latitude, longitude, representative
